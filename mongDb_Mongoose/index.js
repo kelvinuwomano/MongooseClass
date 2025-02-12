@@ -36,7 +36,7 @@ app.get("/", async (req, res) => {
   try {
     const getBooks = await bookModel.find();
     res.status(200).json({ message: "all books", books: getBooks });
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({ message: "an error occured", err });
   }
 });
