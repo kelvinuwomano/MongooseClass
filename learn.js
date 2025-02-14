@@ -1,53 +1,58 @@
 const express = require("express");
 const mongoose = require("mongoose");
+require("dotenv/config");
 
 const app = express();
-const port = 5700;
+const port = process.env.port;
 
 app.use(express.json());
 
 mongoose
-  .connect("mongodb://localhost:27017/libaryDB")
-  .then(() => {
-    console.log("Connected to db");
-  })
-  .catch((err) => {
-    console.log("An Error Occured", err);
-  });
-
-const BookSchema = new mongoose.Schema({
-    title: String,
-    author: String,
-    yearPublished: Number,
-    category: String,
+.connect()
+.then(() => {
+    console.log("Connected")
+})
+.catch((error) => {
+    console.log("An error occured", error)
 });
 
-const bookModel = mongoose.model("book", BookSchema);
+const PatientSchema = new mongoose.Schema({
+    name: String,
+    age: Number,
+    illness: String,
+    condition: String,
+});
 
-app.get("/", async (req, res) => {
+const patientModel = mongoose.model("patient", PatientSchema);
+
+app.get("/get-all-patients", async (req, res) => {
     try {
-        const getBooks = await bookModel.find();
-        res.status(200).json({message: "Gottten all books", book: getBooks})
+        const getAllPatients = await patientModel.find();
+        res.status(200).json({status: true, getAllPatients})
     } catch (error) {
-        res.status(404).json({message:"Not found", error})
+        res.status(400).json({status: false, error});
     }
 });
 
-app.get("/:id", async (req, res) => {
+app.post("/create-patient", async (req, res) => {
     try {
-        let {id} = req.params;
-        const getOneBook = await bookModel.findById(id);
-        if (!getOneBook) {
-            
+        const { name, age, illness, condition} = req.body;
+        if (name && age && illness && condition) {
+            patientModel.create({
+                name,
+                age,
+                illness,
+                condition,
+            })
         }
-        res.status(200).json({message: "Gottten all books", book: getOneBook});
+        res.status(200).json({status: true})
     } catch (error) {
-        res.status(404).json({message: "Unable to get book", error});
+        res.status(500).json({status: false, error: error.message})
     }
 });
 
-const date = new Date();
+app.
 
 app.listen(port, () => {
-    console.log(date.toDateString, port)
+    console.log("App is listening to port", port)
 });

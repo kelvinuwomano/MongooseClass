@@ -55,6 +55,8 @@ app.get("/login/:email", async (req, res) => {
         const { email, password} = req.body;
 
         const checkIfUserExist = await userModel.findOne({email});
+        console.log(checkIfUserExist);
+        
         if (!checkIfUserExist) {
             res.status(400).json({message: "Invalid Email or Password"});
         }
